@@ -1,12 +1,30 @@
 import requests
+import os
 
-url = "https://jsonplaceholder.typicode.com/posts/1"
-response = requests.get(url)
+url = input("Enter API URL: ")
+key = input("Enter Dictionary Key: ")
 
-# Check if the request was successful (status code 200)
-if response.status_code == 200:
-    data = response.json()  # Parse the JSON response into a Python dictionary
-    print(data)
-    print("Title:", data["title"])
+# TEST URL : "https://jsonplaceholder.typicode.com/posts/1"
+try:
+    response = requests.get(url)
+except Exception as e:
+    print(f"Unable get API data: {e}")
+    os._exit(1)
+
+
+def contains_key(value, key):
+    if isinstance(value, dict):
+        return key in value or any(
+            contains_key(item, key) for item in value.values()
+        )
+    return False
+
+data = response.json()  
+
+if response.status_code != 200:
+    print(f"Unable get API data: Response {response.status_code}") 
+
+if contains_key(data, key):
+    print(f"{key}:", data[key])
 else:
-    print(f"Error: {response.status_code}")
+    print(f"Unable to find key: {key}") 
